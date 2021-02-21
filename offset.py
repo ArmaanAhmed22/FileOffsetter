@@ -26,6 +26,10 @@ def parseArgs():
 	parser.add_argument("--allow-partial","-p",help="Allow for partial match. Essentially doesn't need the 'match' to start from the beginning",action="store_true")
 	parser.add_argument("--log","-l",help="Creates a log in the 'input' directory",action="store_true")
 	args = parser.parse_args()
+
+	if args.match == None or args.input == None or args.offset == None:
+		raise Exception("--math, --offset, and --input command line arguments are necessary")
+
 	args.match = " ".join(args.match)
 	args.offset = int(args.offset)
 	return args
