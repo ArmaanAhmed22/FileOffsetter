@@ -142,9 +142,11 @@ def matchAndRename(files,offsets):
 	modified_match_pattern = modified_match_pattern.replace("`", "\d+")
 	iter_length = sum([1 for i in re.finditer(offset_signal,args.match)])
 	file_modified = 0
+	used_files = []
 	for file in files:
 		init_search = re.search(("^" if not args.allow_partial else "")+modified_match_pattern, file)
 		if not init_search is None:
+			used_files.append(file)
 			file_modified+=1
 			cur_pattern = "^"+file[:init_search.span()[0]]
 			cur_num = None
@@ -177,8 +179,11 @@ def matchAndRename(files,offsets):
 					new_file_name+=str(cur_num)
 					cur_pattern+=str(unmodified_num)
 					new_file_name+=re.search(f"(?<={cur_pattern}).+",file).group()
-			os.rename(os.path.join(args.input,file),os.path.join(args.input,new_file_name))
 			changes[file] = new_file_name
+	for u_file in used_files:
+		os.rename(os.path.join(args.input,u_file),os.path.join(args.input,u_file+".temp"))
+	for u_file in used_files:
+		os.rename(os.path.join(args.input,u_file+".temp"),os.path.join(args.input,changes[u_file]))
 	print(color.BOLD+f"SUMMARY: {file_modified} files modified"+color.END)
 	return changes
 def create_log(changes,log_list_filtered):
